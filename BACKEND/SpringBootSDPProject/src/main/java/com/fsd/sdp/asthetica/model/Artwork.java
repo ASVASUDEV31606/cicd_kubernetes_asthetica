@@ -47,6 +47,11 @@ public class Artwork
     @Enumerated(EnumType.STRING)
     @Column(name="artwork_category", nullable=false,length = 20)
     private Category category;
+    
+    
+    @Column(name = "artwork_views", nullable = false, columnDefinition = "BIGINT DEFAULT 0")
+    private Long views = 0L;
+
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
@@ -94,5 +99,11 @@ public class Artwork
 	}
 	public void setCategory(Category category) {
 		this.category = category;
+	}
+	public Long getViews() {
+		return views;
+	}
+	public void setViews(Long views) {
+		this.views = views;
 	}
 }

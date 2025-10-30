@@ -63,12 +63,17 @@ public class SellerController
 		  }
 	  }
 	  
+	  
 	  @GetMapping("/artwork/{aid}")
-	  public ResponseEntity<?> getArtwork(@PathVariable int aid){
-		  try {
-			  return ResponseEntity.ok(artworkService.viewartworkbyid(aid));
-		  }catch(Exception e) {
-			  return ResponseEntity.status(500).body("Unable to fetch the artwork");
-		  }
-	  }
+	    public ResponseEntity<Artwork> viewArtwork(@PathVariable int aid) {
+	        artworkService.incrementViews(aid);
+	        Artwork artwork = artworkService.getArtworkById(aid);
+	        return ResponseEntity.ok(artwork);
+	    }
+	  
+	  @PutMapping("/artwork/{id}/increment")
+	    public ResponseEntity<String> incrementArtworkViews(@PathVariable int id) {
+	        artworkService.incrementViews(id);
+	        return ResponseEntity.ok("Views incremented successfully");
+	    }
 }

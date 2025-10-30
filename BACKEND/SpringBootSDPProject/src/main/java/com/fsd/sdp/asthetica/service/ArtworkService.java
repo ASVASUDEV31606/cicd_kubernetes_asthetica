@@ -17,5 +17,7 @@ public interface ArtworkService
 	public String updateartwork(Artwork artwork);
 	public long displayartworkcount();
 	public Map<String, Integer> getCategoryCounts();
+	void incrementViews(int artworkId);
+    Artwork getArtworkById(int id);
 	
 }

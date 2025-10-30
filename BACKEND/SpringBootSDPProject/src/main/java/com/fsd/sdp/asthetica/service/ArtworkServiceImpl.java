@@ -94,5 +94,19 @@ public class ArtworkServiceImpl implements ArtworkService
 		}
 		
 	}
+	
+	@Override
+    public void incrementViews(int artworkId) {
+        Artwork artwork = artworkRepository.findById(artworkId)
+            .orElseThrow(() -> new RuntimeException("Artwork not found"));
+        artwork.setViews(artwork.getViews() + 1);
+        artworkRepository.save(artwork);
+    }
+
+    @Override
+    public Artwork getArtworkById(int id) {
+        return artworkRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Artwork not found"));
+    }
 
 }
