@@ -13,11 +13,11 @@ const PoppinsTypography = styled(Typography)({
 const ViewProduct = () => {
   const [artist, setArtist] = useState('');
   const [artworks, setArtworks] = useState([]);
+  const [views, setViews] = useState(0); // 👈 NEW: Track artwork views
   const { id } = useParams();
   const username = localStorage.getItem('username');
   let isCustomerLoggedIn = sessionStorage.getItem('isCustomerLoggedIn') === 'true';
 
-  // Fallback: If isCustomerLoggedIn is not set in sessionStorage, infer from username
   if (!isCustomerLoggedIn && username) {
     isCustomerLoggedIn = true;
     sessionStorage.setItem('isCustomerLoggedIn', 'true');
@@ -46,23 +46,26 @@ const ViewProduct = () => {
 
   const painting = artworks.find((art) => art.id.toString() === id);
 
-  // Fetch artist
+  // Fetch artist + increment view count
   useEffect(() => {
     if (!painting) return;
 
-    const handleArtist = async (artistId) => {
+    const handleArtistAndViews = async (artistId) => {
       try {
-        const response = await axios.get(`${config.url}/user/getusername/${artistId}`);
-        setArtist(response.data);
+        // 🧠 Increment and fetch updated artwork details
+        const response = await axios.get(`${config.url}/seller/artwork/${painting.id}`);
+        setViews(response.data.views || 0);
+
+        const artistRes = await axios.get(`${config.url}/user/getusername/${artistId}`);
+        setArtist(artistRes.data);
       } catch (err) {
-        toast.error(err.message);
+        toast.error('Failed to load artwork details.');
       }
     };
 
-    handleArtist(painting.artistId);
+    handleArtistAndViews(painting.artistId);
   }, [painting?.artistId]);
 
-  // Early returns
   if (!Array.isArray(artworks) || artworks.length === 0) {
     return <PoppinsTypography variant="h6">Loading artwork details...</PoppinsTypography>;
   }
@@ -120,7 +123,7 @@ const ViewProduct = () => {
               razorpay_signature: response.razorpay_signature,
               username,
               artwork_id: id,
-              amount: painting.price // Add amount to the payload
+              amount: painting.price,
             };
 
             const verifyRes = await axios.post(`${config.url}/api/payment/verify`, verifyPayload);
@@ -140,9 +143,7 @@ const ViewProduct = () => {
           email: 'user@example.com',
           contact: '9866166825',
         },
-        theme: {
-          color: '#3399cc',
-        },
+        theme: { color: '#3399cc' },
       };
 
       const rzp = new window.Razorpay(options);
@@ -163,14 +164,13 @@ const ViewProduct = () => {
         padding: { xs: '1rem', sm: '1.5rem', md: '2rem' },
         boxSizing: 'border-box',
         display: 'flex',
-        flexDirection: { xs: 'column', sm: 'row' }, // Stack vertically on mobile
-        gap: { xs: '1rem', sm: '2rem' }, // Responsive gap
+        flexDirection: { xs: 'column', sm: 'row' },
+        gap: { xs: '1rem', sm: '2rem' },
       }}
     >
-      {/* Image Section */}
       <Box
         sx={{
-          width: { xs: '100%', sm: '400px' }, // Full width on mobile, fixed width on larger screens
+          width: { xs: '100%', sm: '400px' },
           flexShrink: 0,
           display: 'flex',
           justifyContent: 'center',
@@ -189,7 +189,6 @@ const ViewProduct = () => {
         />
       </Box>
 
-      {/* Details Section */}
       <Box
         sx={{
           flex: 1,
@@ -199,70 +198,39 @@ const ViewProduct = () => {
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
         }}
       >
-        <PoppinsTypography
-          variant="h4"
-          gutterBottom
-          sx={{
-            fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' }, // Responsive font size
-          }}
-        >
+        <PoppinsTypography variant="h4" gutterBottom sx={{ fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' } }}>
           {painting.title}
         </PoppinsTypography>
-        <PoppinsTypography
-          variant="subtitle1"
-          color="textSecondary"
-          sx={{
-            fontSize: { xs: '0.9rem', sm: '1rem' },
-          }}
-        >
+
+        <PoppinsTypography variant="subtitle1" color="textSecondary">
           By: {artist}
         </PoppinsTypography>
-        <PoppinsTypography
-          variant="h5"
-          color="green"
-          sx={{
-            mt: 2,
-            fontSize: { xs: '1.25rem', sm: '1.5rem' },
-          }}
-        >
+
+        {/* 👇 NEW: Show updated views count */}
+        <PoppinsTypography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+          👁️ {views} views
+        </PoppinsTypography>
+
+        <PoppinsTypography variant="h5" color="green" sx={{ mt: 2 }}>
           ₹{painting.price.toLocaleString()}
         </PoppinsTypography>
-        <PoppinsTypography
-          variant="body1"
-          sx={{
-            mt: 2,
-            fontSize: { xs: '0.875rem', sm: '1rem' },
-          }}
-        >
+
+        <PoppinsTypography variant="body1" sx={{ mt: 2 }}>
           {painting.description}
         </PoppinsTypography>
-        <PoppinsTypography
-          variant="body2"
-          sx={{
-            mt: 2,
-            fontSize: { xs: '0.75rem', sm: '0.875rem' },
-          }}
-        >
+
+        <PoppinsTypography variant="body2" sx={{ mt: 2 }}>
           Dimensions: {painting.height} x {painting.width} cm
         </PoppinsTypography>
-        <PoppinsTypography
-          variant="body2"
-          sx={{
-            mt: 1,
-            fontSize: { xs: '0.75rem', sm: '0.875rem' },
-          }}
-        >
+
+        <PoppinsTypography variant="body2" sx={{ mt: 1 }}>
           Category: {painting.category}
         </PoppinsTypography>
-        <PoppinsTypography
-          variant="body2"
-          sx={{
-            mt: 1,
-            fontSize: { xs: '0.75rem', sm: '0.875rem' },
-          }}
-        >
+
+        <PoppinsTypography variant="body2" sx={{ mt: 1 }}>
           Status: <strong>{painting.status}</strong>
         </PoppinsTypography>
+
         <Button
           variant="contained"
           color="primary"
@@ -272,7 +240,7 @@ const ViewProduct = () => {
             fontWeight: 'bold',
             padding: { xs: '0.75rem 1.5rem', sm: '0.75rem 2rem' },
             fontSize: { xs: '0.875rem', sm: '1rem' },
-            width: { xs: '100%', sm: 'auto' }, 
+            width: { xs: '100%', sm: 'auto' },
           }}
           onClick={handleBuyNow}
         >
