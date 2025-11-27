@@ -6,12 +6,6 @@
 *.settings/
 *.factorypath
 
-# Ignore Maven target and build files
-target/
-mvnw
-mvnw.cmd
-.mvn/wrapper/maven-wrapper.jar
-dependency-reduced-pom.xml
 
 # Ignore logs and temporary files
 logs/
