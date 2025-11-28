@@ -71,7 +71,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: phanee2708/asthetica-kubernetes-backend:latest  # <-- change this
+          image: asvasudev/asthetica-kubernetes-backend:latest  # <-- change this
           ports:
             - containerPort: 6969
 ---
@@ -110,7 +110,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: phanee2708/asthetica-kubernetes-frontend:latest  # <-- change this
+          image: asvasudev/asthetica-kubernetes-frontend:latest  # <-- change this
           ports:
             - containerPort: 80
           # env:
