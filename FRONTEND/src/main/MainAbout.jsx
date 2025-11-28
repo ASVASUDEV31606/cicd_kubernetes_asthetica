@@ -108,7 +108,16 @@ const MainAbout = () => {
       </Box>
 
       {/* Our Story */}
-      <Container sx={{ py: 6 }}>
+      <Container sx={{ py: 1 }}>
+        <Box sx={{ mb: 2, textAlign: 'center' }}>
+          <marquee
+            behavior="scroll"
+            direction="left"
+            style={{ fontSize: '20px', fontWeight: 500 }}
+          >
+            vasudev
+          </marquee>
+        </Box>
         <Typography variant="h4" gutterBottom>
           Our Story
         </Typography>
